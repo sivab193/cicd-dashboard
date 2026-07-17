@@ -3,6 +3,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Status palette — fixed, never themed. See dataviz skill references/palette.md */
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+  --status-neutral: #898781;
+  --status-info: #2a78d6;
 }
 
 @theme inline {
@@ -16,6 +24,7 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --status-info: #3987e5;
   }
 }
 
