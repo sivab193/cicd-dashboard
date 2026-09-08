@@ -13,6 +13,8 @@ python3 -m venv .venv
 
 Open `http://127.0.0.1:5173`. Sample mode is enabled by default and labels every simulated provider action. The local fallback database is SQLite; production uses PostgreSQL through `DATABASE_URL`.
 
+Vercel can deploy the Vite dashboard and the FastAPI function from this repository. Set the Vercel project Root Directory to the repository root (the directory containing `package.json` and `vercel.json`) and provide `DATABASE_URL` (PostgreSQL) plus the production environment variables below for durable, live data. Without `DATABASE_URL`, Vercel uses an in-memory demo database because its function filesystem is ephemeral.
+
 ## Production configuration
 
 Copy `.env.example` to `.env`, set `DEMO_MODE=false`, generate `SESSION_SECRET`, and generate a Fernet key for `MASTER_ENCRYPTION_KEY`. Set `APP_URL` to the exact public HTTPS origin. Never commit `.env` or the GitHub App private key.
