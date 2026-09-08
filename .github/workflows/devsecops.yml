@@ -1,0 +1,64 @@
+name: DevSecOps
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    container: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - run: semgrep scan --config auto --json --output semgrep.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: semgrep, path: semgrep.json}
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: gitleaks/gitleaks-action@v2
+
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          format: json
+          output: trivy.json
+          exit-code: "1"
+          severity: CRITICAL
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: trivy, path: trivy.json}
+
+  osv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google/osv-scanner-action/osv-scanner-action@v2.0.2
+        with: {scan-args: "--format json --output osv.json -r ."}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: osv, path: osv.json}
+
+  sbom:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anchore/sbom-action@v0
+        with: {format: cyclonedx-json, output-file: sbom.cdx.json}
